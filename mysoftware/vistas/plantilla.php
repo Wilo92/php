@@ -13,21 +13,36 @@
 
 <body>
 
-    <!-- Main container -->
-    <main class="full-box main-container">
-        <!---------nav lateral--------->
-        <?php include "./vistas/inc/NavLateral.php"; ?>
+    <?php
+    $peticionAjax = false;
+    require_once "./controladores/vistasControlador.php";
+    $IV = new vistasControlador();
+    $vistas = $IV->obtener_vistas_controlador();
 
-        <!-- Page content -->
-        <section class="full-box page-content">
-            <?php include "./vistas/inc/NavBar.php"; ?>
+    if ($vistas = "login" or $vistas = "404") {
+        require_once "./vistas/contenidos/" . $vistas . "-view.php";
+    } else {
+    ?>
 
+        <!-- Main container -->
+        <main class="full-box main-container">
+            <!---------nav lateral--------->
+            <?php include "./vistas/inc/NavLateral.php"; ?>
 
+            <!-- Page content -->
+            <section class="full-box page-content">
+                <?php
+                include "./vistas/inc/NavBar.php";
+                include $vistas;
+                ?>
 
-        </section>
-    </main>
+            </section>
+        </main>
 
-    <?php include "./vistas/inc/Script.php";?>
+    <?php
+    }
+    include "./vistas/inc/Script.php";
+    ?>
 
 
 
