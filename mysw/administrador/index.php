@@ -1,6 +1,6 @@
 <?php
 if($_POST){
-    header('Location:inicio.php');
+    header("Location:inicio.php");
 
 }
 ?>
@@ -32,7 +32,7 @@ if($_POST){
                         Header
                     </div>
                     <div class="card-body">
-                        <form method="$_POST">
+                        <form method="POST">
                             <div class="form-group">
                                 <label>Usuario</label>
 
