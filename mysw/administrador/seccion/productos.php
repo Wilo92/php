@@ -18,17 +18,56 @@ switch ($accion) {
 
         $sentenciaSQL = $conexion->prepare("INSERT INTO libros(nombre, imagen) VALUES (:nombre,:imagen);");
         $sentenciaSQL->bindParam(":nombre", $txtNombre);
-        $sentenciaSQL->bindParam(":imagen", $txtImagen);
+
+        $fecha = new DateTime();
+        $nombreArchivo=($txtImagen!="")?$fecha->getTimestamp()."_".$_FILES["txtImagen"]["name"]:"imagen.jpg";
+        $tmpImagen=$_FILES["txtImagen"]["tmp_name"];
+
+        if($tmpImagen!=""){
+            move_uploaded_file($tmpImagen,"../../img/".$nombreArchivo);
+        }
+
+        $sentenciaSQL->bindParam(":imagen", $nombreArchivo);
         $sentenciaSQL->execute();
         break;
 
     case "Modificar";
-        echo "presionado boton modificar";
+        $sentenciaSQL = $conexion->prepare("UPDATE libros SET nombre=:nombre WHERE id=:id");
+        $sentenciaSQL->bindParam(":nombre", $txtNombre);
+        $sentenciaSQL->bindParam(":id", $txtID);
+        $sentenciaSQL->execute();
+
+        if ($txtImagen != "") {
+            $sentenciaSQL = $conexion->prepare("UPDATE libros SET imagen=:imagen WHERE id=:id");
+            $sentenciaSQL->bindParam(":imagen", $txtImagen);
+            $sentenciaSQL->bindParam(":id", $txtID);
+            $sentenciaSQL->execute();
+        }
+
 
         break;
 
     case "Cancelar";
         echo "presionado boton cancelar";
+
+        break;
+
+    case "Seleccionar";
+
+        $sentenciaSQL = $conexion->prepare("SELECT * FROM libros WHERE id=:id");
+        $sentenciaSQL->bindParam(":id", $txtID);
+
+        $sentenciaSQL->execute();
+        $libro = $sentenciaSQL->fetch(PDO::FETCH_LAZY);
+        $txtNombre = $libro["nombre"];
+        $txtImagen = $libro["imagen"];
+        break;
+
+    case "Borrar";
+        $sentenciaSQL = $conexion->prepare("DELETE  FROM libros WHERE id=:id");
+        $sentenciaSQL->bindParam(":id", $txtID);
+
+        $sentenciaSQL->execute();
 
         break;
 }
@@ -54,17 +93,19 @@ $listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="textID">ID:</label>
-                    <input type="text" class="form-control" name="txtID" id="txtID" placeholder="Enter ID">
+                    <input type="text" class="form-control" value="<?php echo $txtID; ?>" name="txtID" id="txtID" placeholder="Enter ID">
                 </div>
 
                 <div class="form-group">
                     <label for="txtNombre">Nombre:</label>
-                    <input type="text" class="form-control" name="txtNombre" id="txtNombre" placeholder="Enter product Name">
+                    <input type="text" class="form-control" value="<?php echo $txtNombre; ?>" name="txtNombre" id="txtNombre" placeholder="Enter product Name">
 
                 </div>
 
                 <div class="form-group">
                     <label for="txtNombre">Imagen:</label>
+
+                    <?php echo $txtImagen; ?>
                     <input type="file" class="form-control" name="txtImagen" id="txtImagen" placeholder="Enter product Name">
                 </div>
 
@@ -98,13 +139,23 @@ $listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
             </tr>
         </thead>
         <tbody>
-            <?php foreach($listaLibros as $libro) { ?>
+            <?php foreach ($listaLibros as $libro) { ?>
 
                 <tr>
                     <td><?php echo $libro["id"]; ?></td>
                     <td><?php echo $libro["nombre"]; ?></td>
                     <td><?php echo $libro["imagen"]; ?></td>
-                    <td>Seleccion / Borrar</td>
+
+                    <td>
+
+
+                        <form method="post">
+                            <input type="hidden" name="txtID" id="txtID" value="<?php echo $libro["id"]; ?>" />
+                            <input type="submit" name="accion" value="Seleccionar" class="btn btn-primary" />
+                            <input type="submit" name="accion" value="Borrar" class="btn btn-danger" />
+                        </form>
+                    </td>
+
                 </tr>
             <?php } ?>
         </tbody>
