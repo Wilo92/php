@@ -11,15 +11,15 @@ $txtNombre = (isset($_POST["txtNombre"])) ? $_POST["txtNombre"] : "";
 $txtImagen = (isset($_FILES["txtImagen"]["name"])) ? $_FILES["txtImagen"]["name"] : "";
 $accion = (isset($_POST["accion"])) ? $_POST["accion"] : "";
 
-echo $txtID . "<br/>";
-echo $txtNombre . "<br/>";
-echo $txtImagen . "<br/>";
-echo $accion . "<br/>";
-
+include_once("../config/bd.php");
 
 switch ($accion) {
     case 'Agregar':
-        echo "presionado boton agregar";
+
+        $sentenciaSQL = $conexion->prepare("INSERT INTO libros(nombre, imagen) VALUES (:nombre,:imagen);");
+        $sentenciaSQL->bindParam(":nombre", $txtNombre);
+        $sentenciaSQL->bindParam(":imagen", $txtImagen);
+        $sentenciaSQL->execute();
         break;
 
     case "Modificar";
@@ -32,6 +32,10 @@ switch ($accion) {
 
         break;
 }
+$sentenciaSQL = $conexion->prepare("SELECT * FROM libros");
+$sentenciaSQL->execute();
+
+$listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -94,13 +98,15 @@ switch ($accion) {
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>2</td>
-                <td>Aprende</td>
-                <td>imagen.jpg</td>
-                <td>Seleccionar</td>
-            </tr>
+            <?php foreach($listaLibros as $libro) { ?>
 
+                <tr>
+                    <td><?php echo $libro["id"]; ?></td>
+                    <td><?php echo $libro["nombre"]; ?></td>
+                    <td><?php echo $libro["imagen"]; ?></td>
+                    <td>Seleccion / Borrar</td>
+                </tr>
+            <?php } ?>
         </tbody>
     </table>
 </div>
