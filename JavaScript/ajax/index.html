@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="leerTextos()">LEER TEXTO 1</button>
+    <p id="imprimir texto"></p>
+
+    <script>
+        function leerTextos(){
+            var ajax = new XMLHttpRequest();
+            ajax.open('GET','texto1.txt');
+            ajax.send(null);
+
+            ajax.onload=function(){
+                console.log(ajax.response);
+            }
+        }
+    </script>
+</body>
+</html>

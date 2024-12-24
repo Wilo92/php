@@ -1,0 +1,1 @@
+var categorias = ['camisas','pantalo','buso','chaqueta'];
